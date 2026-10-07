@@ -1,11 +1,8 @@
 <?php
-
 session_start();
-
 include "db.php";
 
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "admin") {
-
     header("Location: login.php");
     exit();
 }
@@ -14,70 +11,45 @@ $error = "";
 $success = "";
 
 if (isset($_POST["create"])) {
-
-    $title = $_POST["title"];
+    $category_name = $_POST["category_name"];
     $description = $_POST["description"];
 
-    if (empty($title)) {
-
-        $error = "Assignment title is required.";
-
+    if (empty($category_name)) {
+        $error = "Category name is required.";
     } elseif (empty($description)) {
-
-        $error = "Assignment description is required.";
-
+        $error = "Description is required.";
     } else {
-
-        $stmt = $conn->prepare("INSERT INTO assignments (title, description) VALUES (?, ?)");
-        $stmt->bind_param("ss", $title, $description);
+        $stmt = $conn->prepare("INSERT INTO categories (category_name, description) VALUES (?, ?)");
+        $stmt->bind_param("ss", $category_name, $description);
 
         if ($stmt->execute()) {
-
-            $success = "Assignment created successfully.";
-
+            $success = "Category created successfully.";
         } else {
-
-            $error = "Failed to create assignment.";
+            $error = "Failed to create category.";
         }
     }
 }
 
 include "header.php";
-
 ?>
 
 <div class="container">
-
-    <h2>Create Assignment</h2>
+    <h2>Create Category</h2>
 
     <?php
-
-    if ($error != "") {
-        echo "<p class='error'>$error</p>";
-    }
-
-    if ($success != "") {
-        echo "<p class='success'>$success</p>";
-    }
-
+    if ($error != "") echo "<p class='error'>$error</p>";
+    if ($success != "") echo "<p class='success'>$success</p>";
     ?>
 
-    <form method="post" onsubmit="return validateAssignment()">
-
-        <label>Assignment Title</label>
-
-        <input type="text" id="assignment_title" name="title">
+    <form method="post" onsubmit="return validateCategory()">
+        <label>Category Name</label>
+        <input type="text" id="category_name" name="category_name">
 
         <label>Description</label>
+        <textarea id="category_description" name="description"></textarea>
 
-        <textarea id="assignment_description" name="description"></textarea>
-
-        <button type="submit" name="create">
-            Create Assignment
-        </button>
-
+        <button type="submit" name="create">Add Category</button>
     </form>
-
 </div>
 
 <script src="script.js"></script>
