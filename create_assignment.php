@@ -1,100 +1,85 @@
-<?php else: ?>
+<?php
 
-                    <div class="table-responsive">
+session_start();
 
-                        <table class="table align-middle">
+include "db.php";
 
-                            <thead>
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "admin") {
 
-                                <tr>
-                                    <th>#</th>
-                                    <th>Category</th>
-                                    <th>Description</th>
-                                </tr>
+    header("Location: login.php");
+    exit();
+}
 
-                            </thead>
+$error = "";
+$success = "";
 
-                            <tbody>
+if (isset($_POST["create"])) {
 
-                            <?php
-                            $number = 1;
+    $title = $_POST["title"];
+    $description = $_POST["description"];
 
-                            foreach ($categories as $category):
-                            ?>
+    if (empty($title)) {
 
-                                <tr>
+        $error = "Assignment title is required.";
 
-                                    <td>
-                                        <?= $number++ ?>
-                                    </td>
+    } elseif (empty($description)) {
 
-                                    <td>
-                                        <strong>
-                                            <?= htmlspecialchars(
-                                                $category["category_name"]
-                                            ) ?>
-                                        </strong>
-                                    </td>
+        $error = "Assignment description is required.";
 
-                                    <td>
-                                        <?= htmlspecialchars(
-                                            $category["description"]
-                                        ) ?>
-                                    </td>
+    } else {
 
-                                </tr>
+        $stmt = $conn->prepare("INSERT INTO assignments (title, description) VALUES (?, ?)");
+        $stmt->bind_param("ss", $title, $description);
 
-                            <?php endforeach; ?>
+        if ($stmt->execute()) {
 
-                            </tbody>
+            $success = "Assignment created successfully.";
 
-                        </table>
+        } else {
 
-                    </div>
+            $error = "Failed to create assignment.";
+        }
+    }
+}
 
-                <?php endif; ?>
+include "header.php";
 
-            </div>
+?>
 
-        </div>
+<div class="container">
 
-    </div>
+    <h2>Create Assignment</h2>
+
+    <?php
+
+    if ($error != "") {
+        echo "<p class='error'>$error</p>";
+    }
+
+    if ($success != "") {
+        echo "<p class='success'>$success</p>";
+    }
+
+    ?>
+
+    <form method="post" onsubmit="return validateAssignment()">
+
+        <label>Assignment Title</label>
+
+        <input type="text" id="assignment_title" name="title">
+
+        <label>Description</label>
+
+        <textarea id="assignment_description" name="description"></textarea>
+
+        <button type="submit" name="create">
+            Create Assignment
+        </button>
+
+    </form>
 
 </div>
 
+<script src="script.js"></script>
 
-<script>
-
-function validateCategory() {
-
-    const name =
-        document.getElementById("category_name").value.trim();
-
-    const description =
-        document.getElementById("category_description").value.trim();
-
-
-    if (name === "" || description === "") {
-
-        alert("Please complete all fields.");
-
-        return false;
-    }
-
-
-    if (name.length < 3) {
-
-        alert(
-            "Category name must contain at least 3 characters."
-        );
-
-        return false;
-    }
-
-
-    return true;
-}
-
-</script>
-
-<?php require_once "footer.php"; ?>
+<?php include "footer.php"; ?>

@@ -1,155 +1,134 @@
-<div class="alert alert-danger">
-                    <?= htmlspecialchars($error) ?>
-                </div>
+<?php
 
-            <?php endif; ?>
+session_start();
 
+include "db.php";
 
-            <?php if ($success): ?>
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "student") {
 
-                <div class="alert alert-success">
-                    <?= htmlspecialchars($success) ?>
-                </div>
+    header("Location: login.php");
+    exit();
+}
 
-            <?php endif; ?>
+$error = "";
+$success = "";
 
+if (isset($_POST["submit"])) {
 
-            <?php if (!$categories): ?>
+    $assignment_id = $_POST["assignment_id"];
+    $user_id = $_SESSION["user_id"];
 
-                <div class="alert alert-warning">
-                    No categories are available yet.
-                    Please contact the administrator.
-                </div>
+    if (empty($assignment_id)) {
 
-            <?php else: ?>
+        $error = "Please select an assignment.";
 
+    } elseif (!isset($_FILES["file"]) || $_FILES["file"]["error"] != 0) {
 
-            <form
-                method="POST"
-                enctype="multipart/form-data"
-                onsubmit="return validateProject()">
+        $error = "Please select a file.";
 
+    } else {
 
-                <div class="mb-3">
+        $fileName = $_FILES["file"]["name"];
+        $fileTmp = $_FILES["file"]["tmp_name"];
+        $fileSize = $_FILES["file"]["size"];
 
-                    <label class="form-label">
-                        Project Title
-                    </label>
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="title"
-                        name="title"
-                        maxlength="200"
-                        value="<?= htmlspecialchars($_POST["title"] ?? "") ?>">
+        $allowedFile = array("pdf", "docx", "txt");
 
-                </div>
+        if (!in_array($fileExtension, $allowedFile)) {
 
+            $error = "Only PDF, DOCX and TXT files are allowed.";
 
-                <div class="mb-3">
+        } elseif ($fileSize > 5000000) {
 
-                    <label class="form-label">
-                        Category
-                    </label>
+            $error = "File size must be less than 5MB.";
 
-                    <select
-                        class="form-select"
-                        id="category_id"
-                        name="category_id">
+        } else {
 
-                        <option value="">
-                            Select Category
-                        </option>
+            $newFileName = time() . "_" . $fileName;
 
-                        <?php foreach ($categories as $category): ?>
+            $filePath = "uploads/" . $newFileName;
 
-                            <option
-                                value="<?= $category["id"] ?>"
-                                <?= (
-                                    ($_POST["category_id"] ?? "") ==
-                                    $category["id"]
-                                ) ? "selected" : "" ?>>
+            if (move_uploaded_file($fileTmp, $filePath)) {
 
-                                <?= htmlspecialchars(
-                                    $category["category_name"]
-                                ) ?>
+                $stmt = $conn->prepare("INSERT INTO submissions (user_id, assignment_id, file_name, file_path) VALUES (?, ?, ?, ?)");
 
-                            </option>
+                $stmt->bind_param("iiss", $user_id, $assignment_id, $fileName, $filePath);
 
-                        <?php endforeach; ?>
+                if ($stmt->execute()) {
 
-                    </select>
+                    $success = "Assignment submitted successfully.";
 
-                </div>
+                } else {
 
+                    $error = "Failed to save submission.";
+                }
 
-                <div class="mb-3">
+            } else {
 
-                    <label class="form-label">
-                        Description
-                    </label>
+                $error = "Failed to upload file.";
+            }
+        }
+    }
+}
 
-                    <textarea
-                        class="form-control"
-                        id="description"
-                        name="description"
-                        rows="5"><?= htmlspecialchars($_POST["description"] ?? "") ?></textarea>
+$assignmentResult = $conn->query("SELECT * FROM assignments ORDER BY created_at DESC");
 
-                </div>
+include "header.php";
 
+?>
 
-                <div class="mb-3">
+<div class="container">
 
-                    <label class="form-label">
-                        Technology Stack
-                    </label>
+    <h2>Submit Assignment</h2>
 
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="tech_stack"
-                        name="tech_stack"
-                        placeholder="Example: PHP, MySQL, Bootstrap"
-                        value="<?= htmlspecialchars($_POST["tech_stack"] ?? "") ?>">
+    <?php
 
-                </div>
+    if ($error != "") {
+        echo "<p class='error'>$error</p>";
+    }
 
+    if ($success != "") {
+        echo "<p class='success'>$success</p>";
+    }
 
-                <div class="mb-4">
+    ?>
 
-                    <label class="form-label">
-                        Project File
-                    </label>
+    <form method="post" enctype="multipart/form-data" onsubmit="return validateSubmission()">
 
-                    <input
-                        type="file"
-                        class="form-control"
-                        id="project_file"
-                        name="project_file"
-                        accept=".pdf,.docx,.txt">
+        <label>Select Assignment</label>
 
-                    <small class="text-muted">
-                        PDF, DOCX or TXT. Maximum 5 MB.
-                    </small>
+        <select name="assignment_id" id="assignment_id">
 
-                </div>
+            <option value="">Select Assignment</option>
 
+            <?php while ($row = $assignmentResult->fetch_assoc()) { ?>
 
-                <button
-                    type="submit"
-                    class="btn btn-primary">
+                <option value="<?php echo $row["assignment_id"]; ?>">
 
-                    Submit Project
+                    <?php echo $row["title"]; ?>
 
-                </button>
+                </option>
 
-            </form>
+            <?php } ?>
 
-            <?php endif; ?>
+        </select>
 
-        </div>
+        <label>Upload File</label>
 
-    </div>
+        <input type="file" id="assignment_file" name="file">
+
+        <small>Allowed: PDF, DOCX, TXT. Maximum 5MB.</small>
+
+        <button type="submit" name="submit">
+            Submit Assignment
+        </button>
+
+    </form>
 
 </div>
+
+<script src="script.js"></script>
+
+<?php include "footer.php"; ?>

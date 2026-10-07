@@ -1,174 +1,97 @@
 <?php
 
 session_start();
-require_once "db.php";
 
-if (
-    !isset($_SESSION["user_id"]) ||
-    $_SESSION["role"] !== "admin"
-) {
+include "db.php";
+
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "admin") {
+
     header("Location: login.php");
     exit();
 }
 
+$sql = "
+SELECT
+    submissions.submission_id,
+    users.full_name,
+    users.email,
+    assignments.title,
+    submissions.file_name,
+    submissions.file_path,
+    submissions.submitted_at
+FROM submissions
+INNER JOIN users
+ON submissions.user_id = users.user_id
+INNER JOIN assignments
+ON submissions.assignment_id = assignments.assignment_id
+ORDER BY submissions.submitted_at DESC
+";
 
-$stmt = $conn->prepare(
-    "SELECT
-        projects.id,
-        projects.title,
-        projects.description,
-        projects.tech_stack,
-        projects.file_path,
-        projects.created_at,
-        users.full_name,
-        users.email,
-        categories.category_name
-    FROM projects
-    JOIN users
-        ON projects.user_id = users.id
-    JOIN categories
-        ON projects.category_id = categories.id
-    ORDER BY projects.created_at DESC"
-);
+$result = $conn->query($sql);
 
-$stmt->execute();
-
-$submissions = $stmt->fetchAll();
-
-require_once "header.php";
+include "header.php";
 
 ?>
 
-<div class="container">
+<div class="table-container">
 
-    <div class="page-heading">
+    <h2>All Student Submissions</h2>
 
-        <h2>Student Submissions</h2>
+    <table>
 
-        <p class="text-muted">
-            View and download submitted student projects.
-        </p>
+        <tr>
 
-    </div>
+            <th>No</th>
+            <th>Student</th>
+            <th>Email</th>
+            <th>Assignment</th>
+            <th>File</th>
+            <th>Date Submitted</th>
 
+        </tr>
 
-    <div class="table-container">
+        <?php
 
-        <?php if (!$submissions): ?>
+        $no = 1;
 
-            <div class="text-center py-5">
+        while ($row = $result->fetch_assoc()) {
 
-                <h5>No submissions found</h5>
+        ?>
 
-                <p class="text-muted mb-0">
-                    Student submissions will appear here.
-                </p>
+        <tr>
 
-            </div>
+            <td><?php echo $no++; ?></td>
 
-        <?php else: ?>
+            <td>
+                <?php echo $row["full_name"]; ?>
+            </td>
 
-            <div class="table-responsive">
+            <td>
+                <?php echo $row["email"]; ?>
+            </td>
 
-                <table class="table align-middle">
+            <td>
+                <?php echo $row["title"]; ?>
+            </td>
 
-                    <thead>
+            <td>
 
-                        <tr>
-                            <th>Student</th>
-                            <th>Project</th>
-                            <th>Category</th>
-                            <th>Technology</th>
-                            <th>Date</th>
-                            <th>File</th>
-                        </tr>
+                <a href="<?php echo $row["file_path"]; ?>" download>
+                    Download
+                </a>
 
-                    </thead>
+            </td>
 
-                    <tbody>
+            <td>
+                <?php echo $row["submitted_at"]; ?>
+            </td>
 
-                    <?php foreach ($submissions as $submission): ?>
+        </tr>
 
-                        <tr>
+        <?php } ?>
 
-                            <td>
-
-                                <strong>
-                                    <?= htmlspecialchars(
-                                        $submission["full_name"]
-                                    ) ?>
-                                </strong>
-
-                                <br>
-
-                                <small class="text-muted">
-                                    <?= htmlspecialchars(
-                                        $submission["email"]
-                                    ) ?>
-                                </small>
-
-                            </td>
-
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    $submission["title"]
-                                ) ?>
-                            </td>
-
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    $submission["category_name"]
-                                ) ?>
-                            </td>
-
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    $submission["tech_stack"]
-                                ) ?>
-                            </td>
-
-
-                            <td>
-                                <?= date(
-                                    "d M Y",
-                                    strtotime(
-                                        $submission["created_at"]
-                                    )
-                                ) ?>
-                            </td>
-
-
-                            <td>
-
-                                <a
-                                    href="<?= htmlspecialchars(
-                                        $submission["file_path"]
-                                    ) ?>"
-                                    class="btn btn-sm btn-primary"
-                                    download>
-
-                                    Download
-
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                    <?php endforeach; ?>
-
-                    </tbody>
-                </table>
-
-            </div>
-
-        <?php endif; ?>
-
-    </div>
+    </table>
 
 </div>
 
-<?php require_once "footer.php"; ?>
+<?php include "footer.php"; ?>

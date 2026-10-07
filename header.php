@@ -1,10 +1,13 @@
 <?php
 
-if (session_status() === PHP_SESSION_NONE) {
+if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-$currentPage = basename($_SERVER["PHP_SELF"]);
+if (!isset($_SESSION["user_id"])) {
+    header("Location: login.php");
+    exit();
+}
 
 ?>
 
@@ -12,124 +15,38 @@ $currentPage = basename($_SERVER["PHP_SELF"]);
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>PortfolioHub</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+    <title>Assignment System</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark main-navbar">
-    <div class="container">
+<nav>
 
-        <a class="navbar-brand fw-bold" href="index.php">
-            PortfolioHub
-        </a>
+    <h3>Assignment System</h3>
 
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#mainMenu">
+    <?php if ($_SESSION["role"] == "admin") { ?>
 
-            <span class="navbar-toggler-icon"></span>
+        <a href="admin_dashboard.php">Dashboard</a>
+        <a href="create_assignment.php">Create Assignment</a>
+        <a href="view_submissions.php">View Submissions</a>
 
-        </button>
+    <?php } else { ?>
 
-        <div class="collapse navbar-collapse" id="mainMenu">
+        <a href="student_dashboard.php">Dashboard</a>
+        <a href="submit_assignment.php">Submit Assignment</a>
+        <a href="my_submissions.php">My Submissions</a>
 
-            <ul class="navbar-nav ms-auto align-items-lg-center">
+    <?php } ?>
 
-                <?php if (!isset($_SESSION["user_id"])): ?>
+    <a href="logout.php">Logout</a>
 
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="login.php">
-                            Login
-                        </a>
-                    </li>
-
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-light btn-sm px-3"
-                           href="register.php">
-                            Register
-                        </a>
-                    </li>
-
-
-                <?php elseif ($_SESSION["role"] === "student"): ?>
-
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="student_dashboard.php">
-                            Dashboard
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="submit_assignment.php">
-                            Submit Project
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="my_submissions.php">
-                            My Submissions
-                        </a>
-                    </li>
-
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-outline-light btn-sm"
-                           href="logout.php">
-                            Logout
-                        </a>
-                    </li>
-
-
-                <?php elseif ($_SESSION["role"] === "admin"): ?>
-
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="admin_dashboard.php">
-                            Dashboard
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="create_assignment.php">
-                            Categories
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="view_submissions.php">
-                            Submissions
-                        </a>
-                    </li>
-
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-outline-light btn-sm"
-                           href="logout.php">
-                            Logout
-                        </a>
-                    </li>
-
-                <?php endif; ?>
-
-            </ul>
-
-        </div>
-    </div>
 </nav>
+
+<main>

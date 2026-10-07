@@ -1,71 +1,87 @@
 <?php
 
 session_start();
-require_once "db.php";
 
+include "db.php";
+
+$error = "";
+
+// Check if already login
 if (isset($_SESSION["user_id"])) {
 
-    if ($_SESSION["role"] === "admin") {
+    if ($_SESSION["role"] == "admin") {
+
         header("Location: admin_dashboard.php");
+
     } else {
+
         header("Location: student_dashboard.php");
     }
 
     exit();
 }
 
-$error = "";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+// Login process
+if (isset($_POST["login"])) {
 
-    $email = trim($_POST["email"] ?? "");
-    $password = $_POST["password"] ?? "";
+    $email = $_POST["email"];
+    $password = $_POST["password"];
 
-    if ($email === "" || $password === "") {
+    // Server-side validation
+    if (empty($email)) {
 
-        $error = "Please enter email and password.";
+        $error = "Email is required.";
 
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    } elseif (empty($password)) {
 
-        $error = "Please enter a valid email address.";
+        $error = "Password is required.";
 
     } else {
 
-        $stmt = $conn->prepare(
-            "SELECT * FROM users WHERE email = ?"
-        );
+        // Find user
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
 
-        $stmt->execute([$email]);
+        $result = $stmt->get_result();
 
-        $user = $stmt->fetch();
+        if ($result->num_rows > 0) {
 
-        if ($user && password_verify($password, $user["password"])) {
+            $user = $result->fetch_assoc();
 
-            session_regenerate_id(true);
+            // Verify hashed password
+            if (password_verify($password, $user["password"])) {
 
-            $_SESSION["user_id"] = $user["id"];
-            $_SESSION["full_name"] = $user["full_name"];
-            $_SESSION["role"] = $user["role"];
+                $_SESSION["user_id"] = $user["id"];
+                $_SESSION["full_name"] = $user["full_name"];
+                $_SESSION["role"] = $user["role"];
 
-            if ($user["role"] === "admin") {
+                // Redirect according to role
+                if ($user["role"] == "admin") {
 
-                header("Location: admin_dashboard.php");
+                    header("Location: admin_dashboard.php");
+
+                } else {
+
+                    header("Location: student_dashboard.php");
+                }
+
+                exit();
 
             } else {
 
-                header("Location: student_dashboard.php");
+                $error = "Incorrect password.";
             }
-
-            exit();
 
         } else {
 
-            $error = "Incorrect email or password.";
+            $error = "Email not found.";
         }
     }
 }
 
-require_once "header.php";
+include "header.php";
 
 ?>
 
@@ -77,81 +93,43 @@ require_once "header.php";
 
             <div class="card-body">
 
-                <div class="text-center mb-4">
+                <h2>Login</h2>
 
-                    <h3 class="fw-bold">
-                        Welcome Back
-                    </h3>
+                <?php
 
-                    <p class="text-muted">
-                        Login to continue to PortfolioHub.
-                    </p>
+                if ($error != "") {
+                    echo "<p class='error'>$error</p>";
+                }
 
-                </div>
+                ?>
 
+                <form method="post" onsubmit="return validateLogin()">
 
-                <?php if ($error): ?>
+                    <label>Email Address</label>
 
-                    <div class="alert alert-danger">
-                        <?= htmlspecialchars($error) ?>
-                    </div>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           required>
 
-                <?php endif; ?>
+                    <label>Password</label>
 
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           required>
 
-                <form method="POST"
-                      onsubmit="return validateLogin()">
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Email Address
-                        </label>
-
-                        <input
-                            type="email"
-                            class="form-control"
-                            id="email"
-                            name="email"
-                            value="<?= htmlspecialchars($_POST["email"] ?? "") ?>">
-
-                    </div>
-
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Password
-                        </label>
-
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="password"
-                            name="password">
-
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary w-100">
-
+                    <button type="submit" name="login">
                         Login
-
                     </button>
 
                 </form>
 
-
-                <p class="text-center mt-3 mb-0">
-
+                <p>
                     New student?
-
                     <a href="register.php">
                         Create an account
                     </a>
-
                 </p>
 
             </div>
@@ -162,4 +140,6 @@ require_once "header.php";
 
 </div>
 
-<?php require_once "footer.php"; ?>
+<script src="script.js"></script>
+
+<?php include "footer.php"; ?>

@@ -1,154 +1,86 @@
 <?php
 
 session_start();
-require_once "db.php";
 
-if (
-    !isset($_SESSION["user_id"]) ||
-    $_SESSION["role"] !== "student"
-) {
+include "db.php";
+
+if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "student") {
+
     header("Location: login.php");
     exit();
 }
 
+$user_id = $_SESSION["user_id"];
 
-$stmt = $conn->prepare(
-    "SELECT
-        projects.*,
-        categories.category_name
-    FROM projects
-    JOIN categories
-        ON projects.category_id = categories.id
-    WHERE projects.user_id = ?
-    ORDER BY projects.created_at DESC"
-);
+$stmt = $conn->prepare("
+    SELECT submissions.*, assignments.title
+    FROM submissions
+    INNER JOIN assignments
+    ON submissions.assignment_id = assignments.assignment_id
+    WHERE submissions.user_id = ?
+    ORDER BY submissions.submitted_at DESC
+");
 
-$stmt->execute([
-    $_SESSION["user_id"]
-]);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
 
-$projects = $stmt->fetchAll();
+$result = $stmt->get_result();
 
-require_once "header.php";
+include "header.php";
 
 ?>
 
-<div class="container">
+<div class="table-container">
 
-    <div class="page-heading">
+    <h2>My Submissions</h2>
 
-        <h2>My Submissions</h2>
+    <table>
 
-        <p class="text-muted">
-            View all projects you have submitted.
-        </p>
+        <tr>
 
-    </div>
+            <th>No</th>
+            <th>Assignment</th>
+            <th>File</th>
+            <th>Date Submitted</th>
 
+        </tr>
 
-    <div class="table-container">
+        <?php
 
-        <?php if (!$projects): ?>
+        $no = 1;
 
-            <div class="text-center py-5">
+        while ($row = $result->fetch_assoc()) {
 
-                <h5>No submissions yet</h5>
+        ?>
 
-                <p class="text-muted">
-                    Your submitted projects will appear here.
-                </p>
+        <tr>
 
-                <a href="submit_assignment.php"
-                   class="btn btn-primary">
+            <td><?php echo $no++; ?></td>
 
-                    Submit Project
+            <td>
+                <?php echo $row["title"]; ?>
+            </td>
+
+            <td>
+
+                <a href="<?php echo $row["file_path"]; ?>" download>
+
+                    <?php echo $row["file_name"]; ?>
 
                 </a>
 
-            </div>
+            </td>
 
-        <?php else: ?>
+            <td>
+                <?php echo $row["submitted_at"]; ?>
+            </td>
 
-            <div class="table-responsive">
+        </tr>
 
-                <table class="table align-middle">
+        <?php } ?>
 
-                    <thead>
-
-                        <tr>
-                            <th>Project</th>
-                            <th>Category</th>
-                            <th>Technology</th>
-                            <th>Date</th>
-                            <th>File</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                    <?php foreach ($projects as $project): ?>
-
-                        <tr>
-
-                            <td>
-                                <strong>
-                                    <?= htmlspecialchars(
-                                        $project["title"]
-                                    ) ?>
-                                </strong>
-                            </td>
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    $project["category_name"]
-                                ) ?>
-                            </td>
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    $project["tech_stack"]
-                                ) ?>
-                            </td>
-
-                            <td>
-                                <?= date(
-                                    "d M Y",
-                                    strtotime(
-                                        $project["created_at"]
-                                    )
-                                ) ?>
-                            </td>
-
-                            <td>
-
-                                <a
-                                    href="<?= htmlspecialchars(
-                                        $project["file_path"]
-                                    ) ?>"
-                                    class="btn btn-sm btn-outline-primary"
-                                    target="_blank">
-
-                                    View File
-
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                    <?php endforeach; ?>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        <?php endif; ?>
-
-    </div>
+    </table>
 
 </div>
 
-<?php require_once "footer.php"; ?>
+<?php include "footer.php"; ?>

@@ -1,103 +1,137 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background: #f5f7fb;
-    color: #25324b;
-    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f9;
 }
 
-.main-navbar {
-    background: #172554;
-    padding: 14px 0;
+nav {
+    background-color: #212529;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
-.navbar-brand {
-    letter-spacing: 0.5px;
+nav h3 {
+    color: white;
+    margin: 0;
+    margin-right: auto;
 }
 
-.hero {
-    padding: 90px 0;
+nav a {
+    color: white;
+    text-decoration: none;
 }
 
-.hero h1 {
-    font-size: 3rem;
-    font-weight: 700;
+nav a:hover {
+    text-decoration: underline;
 }
 
-.hero-text {
-    color: #64748b;
-    font-size: 1.1rem;
-    max-width: 600px;
-}
-
-.auth-box {
-    max-width: 500px;
-    margin: 60px auto;
-}
-
-.custom-card {
-    background: white;
-    border: 0;
-    border-radius: 16px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
-}
-
-.custom-card .card-body {
+.container {
+    width: 500px;
+    margin: 50px auto;
+    background-color: white;
     padding: 30px;
+    border-radius: 8px;
 }
 
-.page-heading {
-    margin: 35px 0 25px;
+.container h2 {
+    text-align: center;
 }
 
-.page-heading h2 {
-    font-weight: 700;
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
 }
 
-.stat-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    height: 100%;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
 }
 
-.stat-number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1d4ed8;
+textarea {
+    height: 120px;
 }
 
-.project-card {
-    background: white;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 18px;
-    border-left: 4px solid #2563eb;
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+    background-color: #0d6efd;
+    color: white;
+    cursor: pointer;
 }
 
-.project-card h5 {
-    font-weight: 700;
+button:hover {
+    background-color: #0b5ed7;
 }
 
-.form-control,
-.form-select {
-    padding: 11px 13px;
+.error {
+    color: red;
 }
 
-.btn-primary {
-    background: #2563eb;
-    border-color: #2563eb;
+.success {
+    color: green;
+}
+
+.dashboard {
+    width: 90%;
+    margin: 30px auto;
+}
+
+.card-container {
+    display: flex;
+    gap: 20px;
+}
+
+.card {
+    flex: 1;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+}
+
+.assignment-card {
+    background-color: white;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 8px;
 }
 
 .table-container {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    width: 90%;
+    margin: 30px auto;
 }
 
-.footer {
-    background: #172554;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+th,
+td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #212529;
     color: white;
-    padding: 25px 0;
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #212529;
+    color: white;
 }
