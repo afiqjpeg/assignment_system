@@ -5,11 +5,13 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f6f9;
+    background-color: #0f2747;
+    color: #ffffff;
 }
 
+/* NAVBAR */
 nav {
-    background-color: #212529;
+    background-color: #0b1f36;
     padding: 15px 30px;
     display: flex;
     align-items: center;
@@ -17,36 +19,50 @@ nav {
 }
 
 nav h3 {
-    color: white;
     margin: 0;
     margin-right: auto;
+    color: #ffffff;
 }
 
 nav a {
-    color: white;
+    color: #ffffff;
     text-decoration: none;
+    font-weight: bold;
 }
 
 nav a:hover {
-    text-decoration: underline;
+    color: #dceeff;
 }
 
+/* MAIN */
+main {
+    min-height: 75vh;
+}
+
+/* CONTAINER */
 .container {
-    width: 500px;
+    width: 90%;
+    max-width: 550px;
     margin: 50px auto;
-    background-color: white;
     padding: 30px;
-    border-radius: 8px;
+    background-color: #ffffff;
+    color: #111111;
+    border-radius: 10px;
 }
 
 .container h2 {
     text-align: center;
+    color: #0f2747;
+    margin-top: 0;
 }
 
+/* FORM */
 label {
     display: block;
     margin-top: 15px;
     margin-bottom: 5px;
+    color: #0f2747;
+    font-weight: bold;
 }
 
 input,
@@ -54,84 +70,191 @@ select,
 textarea {
     width: 100%;
     padding: 10px;
+    border: 1px solid #b9d8f0;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: #111111;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #0f2747;
 }
 
 textarea {
     height: 120px;
+    resize: vertical;
 }
 
+/* BUTTON */
 button {
     width: 100%;
     margin-top: 20px;
     padding: 10px;
     border: none;
-    background-color: #0d6efd;
-    color: white;
+    border-radius: 5px;
+    background-color: #0f2747;
+    color: #ffffff;
+    font-weight: bold;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #0b5ed7;
+    background-color: #17365d;
 }
 
+/* MESSAGE */
 .error {
-    color: red;
+    background-color: #ffffff;
+    color: #b00020;
+    padding: 10px;
+    border-left: 4px solid #b00020;
 }
 
 .success {
-    color: green;
+    background-color: #dceeff;
+    color: #0f2747;
+    padding: 10px;
+    border-left: 4px solid #0f2747;
 }
 
+/* DASHBOARD */
 .dashboard {
     width: 90%;
-    margin: 30px auto;
+    margin: 35px auto;
 }
 
+.dashboard h2,
+.dashboard h3 {
+    color: #ffffff;
+}
+
+/* CARDS */
 .card-container {
     display: flex;
     gap: 20px;
+    margin-top: 20px;
 }
 
 .card {
     flex: 1;
-    padding: 20px;
-    background-color: white;
+    background-color: #dceeff;
+    color: #0f2747;
+    padding: 25px;
     border-radius: 8px;
+    text-align: center;
 }
 
+.card h3 {
+    margin-top: 0;
+    color: #0f2747;
+}
+
+.card p {
+    font-size: 28px;
+    font-weight: bold;
+    color: #0f2747;
+}
+
+/* SEARCH */
+#search {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/* PROJECT CARD */
 .assignment-card {
-    background-color: white;
+    background-color: #ffffff;
+    color: #111111;
     padding: 20px;
-    margin-top: 15px;
+    margin-bottom: 15px;
     border-radius: 8px;
 }
 
+.assignment-card h3 {
+    color: #0f2747;
+}
+
+.assignment-card a {
+    color: #0f2747;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* TABLE */
 .table-container {
-    width: 90%;
-    margin: 30px auto;
+    width: 92%;
+    margin: 35px auto;
+    overflow-x: auto;
+}
+
+.table-container h2 {
+    color: #ffffff;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
+    background-color: #ffffff;
+    color: #111111;
 }
 
 th,
 td {
     padding: 12px;
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #dceeff;
+    text-align: left;
 }
 
 th {
-    background-color: #212529;
-    color: white;
+    background-color: #17365d;
+    color: #ffffff;
 }
 
+tr:hover {
+    background-color: #eef6ff;
+}
+
+/* LINKS */
+.container a,
+td a {
+    color: #0f2747;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.container a:hover,
+td a:hover {
+    text-decoration: underline;
+}
+
+/* FOOTER */
 footer {
     text-align: center;
     margin-top: 40px;
     padding: 20px;
-    background-color: #212529;
-    color: white;
+    background-color: #0b1f36;
+    color: #ffffff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav h3 {
+        margin-right: 0;
+    }
+
+    .card-container {
+        flex-direction: column;
+    }
+
+    .container {
+        width: 92%;
+    }
 }
