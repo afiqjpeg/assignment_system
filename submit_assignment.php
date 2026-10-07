@@ -40,7 +40,7 @@ if (isset($_POST["submit"])) {
         } elseif ($fileSize > 5000000) {
             $error = "File size must be less than 5MB.";
         } else {
-            $newFileName = time() . "_" . $fileName;
+            $newFileName = $fileName;
             $filePath = "uploads/" . $newFileName;
 
             if (move_uploaded_file($fileTmp, $filePath)) {

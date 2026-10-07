@@ -27,9 +27,11 @@ CREATE TABLE IF NOT EXISTS `categories` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `category_name` (`category_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table assignment_system.categories: ~0 rows (approximately)
+REPLACE INTO `categories` (`id`, `category_name`, `description`, `created_at`) VALUES
+	(1, 'Mobile Application', 'Projects developed for Android or mobile devices.', '2026-10-07 15:41:21');
 
 -- Dumping structure for table assignment_system.projects
 CREATE TABLE IF NOT EXISTS `projects` (
@@ -46,9 +48,12 @@ CREATE TABLE IF NOT EXISTS `projects` (
   KEY `category_id` (`category_id`),
   CONSTRAINT `projects_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `projects_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table assignment_system.projects: ~0 rows (approximately)
+-- Dumping data for table assignment_system.projects: ~2 rows (approximately)
+REPLACE INTO `projects` (`id`, `user_id`, `category_id`, `title`, `description`, `tech_stack`, `file_path`, `created_at`) VALUES
+	(3, 1, 1, 'divj', 'dfjiofrjfiojvfoigvodfgjrffj', 'dpsdjdsfjds', 'uploads/REPORT PW2_25DIT24F1199.pdf', '2026-10-07 16:20:28'),
+	(4, 1, 1, 'REPORT PW3', '-', 'Android Studio', 'uploads/REPORT PW3_25DIT24F1199.pdf', '2026-10-07 16:22:10');
 
 -- Dumping structure for table assignment_system.users
 CREATE TABLE IF NOT EXISTS `users` (
@@ -60,9 +65,12 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table assignment_system.users: ~0 rows (approximately)
+REPLACE INTO `users` (`id`, `full_name`, `email`, `password`, `role`, `created_at`) VALUES
+	(1, 'NUR QURRATUAINI BINTI SAMAD', 'nurainnn12@gmail.com', '$2y$10$gUlKacIHnGk0KchQseV/PuDraWWTfg/3.pQ0HImizSU8gLhb8sgiy', 'student', '2026-10-07 14:42:53'),
+	(5, 'admin', 'admin@gmail.com', '$2y$10$ivbT8YfmZjGivjopxUCNCuz3uwbs3tH8ZOrKEcaxeDr7lKBoetIpK', 'admin', '2026-10-07 15:15:39');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
