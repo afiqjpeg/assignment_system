@@ -1,0 +1,103 @@
+body {
+    background: #f5f7fb;
+    color: #25324b;
+    min-height: 100vh;
+}
+
+.main-navbar {
+    background: #172554;
+    padding: 14px 0;
+}
+
+.navbar-brand {
+    letter-spacing: 0.5px;
+}
+
+.hero {
+    padding: 90px 0;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.hero-text {
+    color: #64748b;
+    font-size: 1.1rem;
+    max-width: 600px;
+}
+
+.auth-box {
+    max-width: 500px;
+    margin: 60px auto;
+}
+
+.custom-card {
+    background: white;
+    border: 0;
+    border-radius: 16px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
+}
+
+.custom-card .card-body {
+    padding: 30px;
+}
+
+.page-heading {
+    margin: 35px 0 25px;
+}
+
+.page-heading h2 {
+    font-weight: 700;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    height: 100%;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1d4ed8;
+}
+
+.project-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 18px;
+    border-left: 4px solid #2563eb;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+.project-card h5 {
+    font-weight: 700;
+}
+
+.form-control,
+.form-select {
+    padding: 11px 13px;
+}
+
+.btn-primary {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.table-container {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.footer {
+    background: #172554;
+    color: white;
+    padding: 25px 0;
+}
