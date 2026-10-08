@@ -101,6 +101,9 @@ include "header.php";
         <label>Category</label>
         <select id="category_id" name="category_id">
             <option value="">Select Category</option>
+            <option value="">Internet Of Thing</option>
+            <option value="">Web Based</option>
+            <option value="">Security System</option>
 
             <?php while ($row = $categoryResult->fetch_assoc()) { ?>
                 <option value="<?php echo $row["id"]; ?>"><?php echo htmlspecialchars($row["category_name"], ENT_QUOTES, "UTF-8"); ?></option>
