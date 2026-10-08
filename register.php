@@ -57,7 +57,7 @@ if (isset($_POST["register"])) {
 
             $role = "student";
 
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("ssss", $full_name, $email, $hashedPassword, $role);
 
             if ($stmt->execute()) {

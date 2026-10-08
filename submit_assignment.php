@@ -12,48 +12,70 @@ $success = "";
 $user_id = $_SESSION["user_id"];
 
 if (isset($_POST["submit"])) {
-    $title = $_POST["title"];
-    $category_id = $_POST["category_id"];
-    $tech_stack = $_POST["tech_stack"];
-    $description = $_POST["description"];
+    $title = trim($_POST["title"] ?? "");
+    $category_id = (int)($_POST["category_id"] ?? 0);
+    $tech_stack = trim($_POST["tech_stack"] ?? "");
+    $description = trim($_POST["description"] ?? "");
 
-    if (empty($title)) {
+    if ($title == "") {
         $error = "Project title is required.";
-    } elseif (empty($category_id)) {
+    } elseif ($category_id <= 0) {
         $error = "Please select category.";
-    } elseif (empty($tech_stack)) {
+    } elseif ($tech_stack == "") {
         $error = "Tech stack is required.";
-    } elseif (empty($description)) {
+    } elseif ($description == "") {
         $error = "Project description is required.";
-    } elseif (!isset($_FILES["file"]) || $_FILES["file"]["error"] != 0) {
-        $error = "Please select a file.";
+    } elseif (!isset($_FILES["file"]) || $_FILES["file"]["error"] != UPLOAD_ERR_OK) {
+        $error = "Please select a valid file (maximum 5MB).";
     } else {
         $fileName = $_FILES["file"]["name"];
         $fileTmp = $_FILES["file"]["tmp_name"];
         $fileSize = $_FILES["file"]["size"];
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
         $allowedFile = array("pdf", "docx", "txt");
 
-        if (!in_array($fileExtension, $allowedFile)) {
+        $categoryStmt = $conn->prepare("SELECT id FROM categories WHERE id = ?");
+        $categoryStmt->bind_param("i", $category_id);
+        $categoryStmt->execute();
+        $validCategory = $categoryStmt->get_result()->num_rows > 0;
+        $categoryStmt->close();
+
+        if (!$validCategory) {
+            $error = "Invalid category.";
+        } elseif (!in_array($fileExtension, $allowedFile, true)) {
             $error = "Only PDF, DOCX and TXT files are allowed.";
         } elseif ($fileSize > 5000000) {
             $error = "File size must be less than 5MB.";
         } else {
-            $newFileName = $fileName;
-            $filePath = "uploads/" . $newFileName;
-
-            if (move_uploaded_file($fileTmp, $filePath)) {
-                $stmt = $conn->prepare("INSERT INTO projects (user_id, category_id, title, description, tech_stack, file_path) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("iissss", $user_id, $category_id, $title, $description, $tech_stack, $filePath);
-
-                if ($stmt->execute()) {
-                    $success = "Project submitted successfully.";
-                } else {
-                    $error = "Failed to save project.";
-                }
+            $mime = (new finfo(FILEINFO_MIME_TYPE))->file($fileTmp);
+            $validMime = array(
+                "pdf" => array("application/pdf"),
+                "docx" => array("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/zip"),
+                "txt" => array("text/plain")
+            );
+            if (!in_array($mime, $validMime[$fileExtension], true)) {
+                $error = "File content does not match the selected format.";
             } else {
-                $error = "Failed to upload file.";
+                $uploadDir = __DIR__ . "/uploads/";
+                if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
+                    $error = "Unable to create upload folder.";
+                } else {
+                    $newFileName = bin2hex(random_bytes(12)) . "." . $fileExtension;
+                    $filePath = "uploads/" . $newFileName;
+                    if (move_uploaded_file($fileTmp, $uploadDir . $newFileName)) {
+                        $stmt = $conn->prepare("INSERT INTO projects (user_id, category_id, title, description, tech_stack, file_path) VALUES (?, ?, ?, ?, ?, ?)");
+                        $stmt->bind_param("iissss", $user_id, $category_id, $title, $description, $tech_stack, $filePath);
+                        if ($stmt->execute()) {
+                            $success = "Project submitted successfully.";
+                        } else {
+                            unlink($uploadDir . $newFileName);
+                            $error = "Failed to save project.";
+                        }
+                        $stmt->close();
+                    } else {
+                        $error = "Failed to upload file. Check uploads folder permission.";
+                    }
+                }
             }
         }
     }
@@ -68,8 +90,8 @@ include "header.php";
     <h2>Submit Portfolio Project</h2>
 
     <?php
-    if ($error != "") echo "<p class='error'>$error</p>";
-    if ($success != "") echo "<p class='success'>$success</p>";
+    if ($error != "") echo "<p class='error'>" . htmlspecialchars($error) . "</p>";
+    if ($success != "") echo "<p class='success'>" . htmlspecialchars($success) . "</p>";
     ?>
 
     <form method="post" enctype="multipart/form-data" onsubmit="return validateSubmission()">
@@ -81,7 +103,7 @@ include "header.php";
             <option value="">Select Category</option>
 
             <?php while ($row = $categoryResult->fetch_assoc()) { ?>
-                <option value="<?php echo $row["id"]; ?>"><?php echo $row["category_name"]; ?></option>
+                <option value="<?php echo $row["id"]; ?>"><?php echo htmlspecialchars($row["category_name"], ENT_QUOTES, "UTF-8"); ?></option>
             <?php } ?>
         </select>
 

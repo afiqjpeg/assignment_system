@@ -39,15 +39,15 @@ include "header.php";
 
         <tr>
             <td><?php echo $no++; ?></td>
-            <td><?php echo $row["title"]; ?></td>
-            <td><?php echo $row["category_name"]; ?></td>
-            <td><?php echo $row["tech_stack"]; ?></td>
+            <td><?php echo htmlspecialchars($row["title"], ENT_QUOTES, "UTF-8"); ?></td>
+            <td><?php echo htmlspecialchars($row["category_name"], ENT_QUOTES, "UTF-8"); ?></td>
+            <td><?php echo htmlspecialchars($row["tech_stack"], ENT_QUOTES, "UTF-8"); ?></td>
             <td>
                 <?php if (!empty($row["file_path"])) { ?>
-                    <a href="<?php echo $row["file_path"]; ?>" download>Download</a>
+                    <a href="<?php echo htmlspecialchars($row["file_path"], ENT_QUOTES, "UTF-8"); ?>" download>Download</a>
                 <?php } ?>
             </td>
-            <td><?php echo $row["created_at"]; ?></td>
+            <td><?php echo htmlspecialchars($row["created_at"], ENT_QUOTES, "UTF-8"); ?></td>
         </tr>
 
         <?php } ?>
